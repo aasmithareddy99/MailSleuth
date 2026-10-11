@@ -1,0 +1,720 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MailSleuth | Email Threat Analysis</title>
+
+<style>
+:root {
+  --bg:#0b1020;
+  --panel:#121a2d;
+  --panel2:#172238;
+  --line:#263550;
+  --text:#edf3ff;
+  --muted:#9aabc5;
+  --blue:#7ab7ff;
+  --green:#56d6a0;
+  --yellow:#ffd166;
+  --red:#ff7272;
+}
+* { box-sizing:border-box; }
+body {
+  margin:0;
+  background:radial-gradient(ellipse at top,#142447 0,#0b1020 55%);
+  color:var(--text);
+  font:15px/1.5 "Segoe UI",Arial,sans-serif;
+}
+header {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:15px;
+  padding:18px max(22px,calc((100vw - 1200px)/2));
+  border-bottom:1px solid var(--line);
+  background:#0b1020ee;
+  position:sticky;
+  top:0;
+  z-index:3;
+}
+.brand { display:flex;gap:12px;align-items:center;font-size:20px;font-weight:800; }
+.logo {
+  width:38px;height:38px;border-radius:12px;
+  background:linear-gradient(140deg,#6ea8ff,#a78bfa);
+  display:grid;place-items:center;color:#0b1020;font-weight:900;
+}
+.tag {
+  font-size:12px;color:var(--green);
+  border:1px solid #286b5a;border-radius:99px;padding:5px 10px;
+}
+main { max-width:1200px;margin:auto;padding:30px 22px 60px; }
+.hero {
+  display:flex;justify-content:space-between;align-items:end;
+  gap:20px;margin-bottom:24px;
+}
+.eyebrow {
+  color:var(--blue);font-size:12px;font-weight:800;
+  letter-spacing:2px;text-transform:uppercase;
+}
+h1 { font-size:clamp(28px,4vw,42px);line-height:1.12;margin:8px 0; }
+p { color:var(--muted);margin:6px 0; }
+.grid { display:grid;grid-template-columns:1.15fr .85fr;gap:18px; }
+.panel {
+  background:linear-gradient(145deg,#151f35,#10182a);
+  border:1px solid var(--line);border-radius:18px;
+  padding:22px;box-shadow:0 16px 40px #0002;
+  min-width:0;
+}
+.panel h2 { font-size:17px;margin:0 0 15px; }
+.field { display:flex;flex-direction:column;gap:7px;margin:13px 0; }
+.field label { font-size:13px;color:#c6d3e8;font-weight:650; }
+input,textarea,select {
+  width:100%;background:#0b1324;color:var(--text);
+  border:1px solid #30415e;border-radius:10px;padding:12px;
+  font:inherit;outline:none;
+}
+input:focus,textarea:focus,select:focus { border-color:var(--blue); }
+textarea { min-height:120px;resize:vertical; }
+input[type="checkbox"] { width:auto; }
+.actions { display:flex;flex-wrap:wrap;gap:10px;margin-top:14px; }
+.btn {
+  border:0;border-radius:10px;padding:11px 16px;
+  font-weight:750;cursor:pointer;background:var(--blue);color:#0b1020;
+}
+.btn.secondary { background:#202d45;color:#e5edff;border:1px solid #344766; }
+.btn:disabled { opacity:.55;cursor:wait; }
+.metrics { display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:18px 0; }
+.metric { padding:17px;background:#121a2d;border:1px solid var(--line);border-radius:14px;min-width:0; }
+.metric span { display:block;color:var(--muted);font-size:12px; }
+.metric strong { display:block;font-size:26px;margin-top:5px;overflow-wrap:anywhere; }
+.report { margin-top:18px;display:none; }
+.scoreline { display:flex;align-items:center;gap:20px;flex-wrap:wrap; }
+.scorecircle {
+  width:100px;height:100px;border-radius:50%;display:grid;place-items:center;
+  border:8px solid var(--blue);font-size:27px;font-weight:800;flex-shrink:0;
+}
+.low { color:var(--green); }
+.suspicious { color:var(--yellow); }
+.high { color:var(--red); }
+.result-grid { display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:16px; }
+.subpanel { background:#0c1425;border:1px solid var(--line);border-radius:12px;padding:15px;min-width:0;overflow-wrap:anywhere; }
+.subpanel h3 { font-size:14px;margin:0 0 10px; }
+.item { padding:10px 0;border-bottom:1px solid #24324a;overflow-wrap:anywhere; }
+.item:last-child { border-bottom:0; }
+.item b { display:block; }
+.item small { color:var(--muted);display:block; }
+.kv {
+  display:grid;grid-template-columns:130px minmax(0,1fr);
+  gap:8px;font-size:13px;padding:7px 0;border-bottom:1px solid #24324a;
+}
+.kv span:first-child { color:var(--muted); }
+.kv span:last-child { overflow-wrap:anywhere; }
+.history { margin-top:18px; }
+.historytop { display:flex;gap:10px;flex-wrap:wrap; }
+.historytop input,.historytop select { flex:1;min-width:160px; }
+.tablewrap { overflow:auto;margin-top:12px; }
+table { width:100%;border-collapse:collapse;min-width:650px; }
+th,td { text-align:left;padding:12px;border-bottom:1px solid var(--line);font-size:13px; }
+th { color:var(--muted);font-weight:600; }
+.linkbtn { border:0;background:transparent;color:var(--blue);cursor:pointer;padding:5px;font-weight:700; }
+.status { margin-top:12px;color:var(--muted);font-size:13px;min-height:20px;overflow-wrap:anywhere; }
+.empty { padding:18px;color:var(--muted);text-align:center; }
+.footer { text-align:center;color:#71829e;font-size:12px;margin-top:30px; }
+.muted { color:var(--muted); }
+a { color:var(--blue);overflow-wrap:anywhere; }
+.ml-note { font-size:12px;color:var(--muted); }
+#mlEvaluationPanel { margin-bottom:18px; }
+@media(max-width:850px) {
+  .grid { grid-template-columns:1fr; }
+  .metrics { grid-template-columns:repeat(2,1fr); }
+  .hero { align-items:start;flex-direction:column; }
+}
+@media(max-width:560px) {
+  main { padding:22px 13px; }
+  .panel { padding:16px; }
+  .result-grid { grid-template-columns:1fr; }
+  .kv { grid-template-columns:100px 1fr; }
+  header { padding:15px; }
+  .tag { font-size:10px; }
+}
+</style>
+</head>
+
+<body>
+<header>
+  <div class="brand"><div class="logo">M</div>MailSleuth</div>
+  <span class="tag">● LOCAL ANALYSIS PROTOTYPE</span>
+</header>
+
+<main>
+  <section class="hero">
+    <div>
+      <div class="eyebrow">Email security workspace</div>
+      <h1>Investigate suspicious emails.</h1>
+      <p>Analyze phishing indicators, inspect message headers, and trace the reported relay path.</p>
+    </div>
+    <span class="muted" id="apiStatus">Connecting to API…</span>
+  </section>
+
+  <div class="metrics">
+    <div class="metric"><span>Total analyses</span><strong id="mTotal">—</strong></div>
+    <div class="metric"><span>High risk</span><strong id="mHigh" class="high">—</strong></div>
+    <div class="metric"><span>Suspicious</span><strong id="mSusp" class="suspicious">—</strong></div>
+    <div class="metric"><span>Average risk</span><strong id="mAvg">—</strong></div>
+  </div>
+
+  <!-- ML evaluation dashboard -->
+  <section class="panel" id="mlEvaluationPanel">
+    <h2>Machine Learning Evaluation</h2>
+    <p>Model: TF-IDF + Logistic Regression</p>
+
+    <div class="metrics">
+      <div class="metric"><span>Accuracy</span><strong id="mlAccuracy">—</strong></div>
+      <div class="metric"><span>Precision</span><strong id="mlPrecision">—</strong></div>
+      <div class="metric"><span>Recall</span><strong id="mlRecall">—</strong></div>
+      <div class="metric"><span>F1 Score</span><strong id="mlF1">—</strong></div>
+    </div>
+
+    <p id="mlEvalStatus" role="status">Click Train / evaluate ML to load metrics.</p>
+    <p class="ml-note">
+      Evaluation uses a small synthetic dataset. These results do not establish real-world performance.
+    </p>
+  </section>
+
+  <div class="grid">
+    <section class="panel">
+      <h2>✳ Analyze an email</h2>
+
+      <div class="field">
+        <label for="apiKey">API key (only if you configured MAILSLEUTH_API_KEY)</label>
+        <input id="apiKey" type="password" autocomplete="off" placeholder="Leave blank for local demo">
+      </div>
+
+      <div class="field">
+        <label for="sender">Sender email / display name</label>
+        <input id="sender" placeholder="Security &lt;security@example.com&gt;">
+      </div>
+
+      <div class="field">
+        <label for="subject">Subject</label>
+        <input id="subject" placeholder="Account notification">
+      </div>
+
+      <div class="field">
+        <label for="body">Email body or message text</label>
+        <textarea id="body" placeholder="Paste the email content here…"></textarea>
+      </div>
+
+      <div class="field">
+        <label for="headers">Raw email headers (optional)</label>
+        <textarea id="headers" placeholder="From: …&#10;Reply-To: …&#10;Received: …&#10;Authentication-Results: …" style="min-height:100px"></textarea>
+      </div>
+
+      <div class="field">
+        <label><input id="useML" type="checkbox" checked> Include trained ML signal when model is available</label>
+        <label><input id="useIntel" type="checkbox"> Enable opt-in DNS / URLhaus hostname checks (hostnames may be queried)</label>
+      </div>
+
+      <div class="actions">
+        <button class="btn" id="analyzeBtn" onclick="analyzeText()">Analyze email</button>
+        <button class="btn secondary" onclick="loadSample()">Load suspicious demo sample</button>
+        <button class="btn secondary" onclick="clearForm()">Clear</button>
+      </div>
+
+      <div class="field">
+        <label for="eml">Or upload an .eml file (max 5 MB)</label>
+        <input type="file" id="eml" accept=".eml,message/rfc822">
+      </div>
+
+      <div class="actions">
+        <button class="btn secondary" id="uploadBtn" onclick="uploadEml()">Analyze uploaded file</button>
+      </div>
+
+      <div class="status" id="formStatus" role="status"></div>
+    </section>
+
+    <section class="panel">
+      <h2>How to read the score</h2>
+      <div class="item"><b class="low">0–39 · Low risk</b><small>Few configured indicators triggered. Not a guarantee of safety.</small></div>
+      <div class="item"><b class="suspicious">40–69 · Suspicious</b><small>Multiple warning signs; investigate sender and links.</small></div>
+      <div class="item"><b class="high">70–100 · High risk</b><small>Several strong indicators; handle with caution.</small></div>
+      <div class="item"><b>Evidence-first analysis</b><small>Each triggered rule is shown with its point contribution and explanation.</small></div>
+      <div class="item"><b>Header-aware</b><small>Supplied authentication results are parsed from headers; the prototype does not perform live SPF/DKIM/DMARC verification.</small></div>
+    </section>
+  </div>
+
+  <!-- Analysis results -->
+  <section class="panel report" id="report">
+    <div class="scoreline">
+      <div class="scorecircle" id="scoreCircle">0</div>
+      <div>
+        <div class="eyebrow">Analysis result</div>
+        <h2 id="classification" style="font-size:25px;margin:5px 0">—</h2>
+        <p id="resultSummary">—</p>
+        <p class="muted" id="resultMeta"></p>
+        <div class="actions">
+          <button class="btn secondary" onclick="downloadReport()">Download forensic report</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="result-grid">
+      <div class="subpanel">
+        <h3>Detected indicators</h3>
+        <div id="findings"></div>
+      </div>
+
+      <div class="subpanel">
+        <h3>Recommendations</h3>
+        <div id="recommendations"></div>
+        <h3 style="margin-top:18px">URLs found</h3>
+        <div id="urls"></div>
+      </div>
+
+      <div class="subpanel">
+        <h3>Header forensics</h3>
+        <div id="forensics"></div>
+        <h3 style="margin-top:15px">Authentication results</h3>
+        <div id="auth"></div>
+      </div>
+
+      <div class="subpanel">
+        <h3>Relay path</h3>
+        <p id="hopCount"></p>
+        <div id="relay"></div>
+      </div>
+
+      <div class="subpanel">
+        <h3>Machine-learning signal</h3>
+        <div id="mlResults"><p class="muted">Train the model to enable this signal.</p></div>
+      </div>
+
+      <div class="subpanel">
+        <h3>Threat intelligence</h3>
+        <div id="intelResults"><p class="muted">Optional lookups are off by default.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Analysis history -->
+  <section class="panel history">
+    <div style="display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap">
+      <div><h2 style="margin-bottom:3px">Recent analyses</h2><p>Saved locally in SQLite.</p></div>
+      <button class="btn secondary" onclick="exportCsv()">Export CSV</button>
+      <button class="btn secondary" id="trainBtn" onclick="trainModel()">Train / evaluate ML</button>
+    </div>
+
+    <div class="historytop">
+      <input id="search" placeholder="Search sender or subject…" oninput="loadHistory()">
+      <select id="filter" onchange="loadHistory()">
+        <option value="">All classifications</option>
+        <option value="Low Risk">Low Risk</option>
+        <option value="Suspicious">Suspicious</option>
+        <option value="High Risk">High Risk</option>
+      </select>
+      <button class="btn secondary" onclick="loadHistory()">Refresh</button>
+    </div>
+
+    <div class="tablewrap">
+      <table>
+        <thead>
+          <tr>
+            <th>ID / Time</th><th>Sender</th><th>Subject</th>
+            <th>Risk</th><th>Classification</th><th>Report</th>
+          </tr>
+        </thead>
+        <tbody id="historyRows">
+          <tr><td colspan="6" class="empty">Loading history…</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <div class="footer">
+    MailSleuth prototype · Rule-based analysis · Keep sensitive email data local and use only authorized test messages.
+  </div>
+</main>
+
+<script>
+"use strict";
+
+let latestResult = null;
+
+const $ = id => document.getElementById(id);
+
+function esc(value) {
+  return String(value ?? "").replace(/[&<>"']/g, ch => ({
+    "&":"&amp;",
+    "<":"&lt;",
+    ">":"&gt;",
+    '"':"&quot;",
+    "'":"&#39;"
+  }[ch]));
+}
+
+function riskClass(classification) {
+  return classification === "High Risk" ? "high" :
+         classification === "Suspicious" ? "suspicious" : "low";
+}
+
+async function api(url, options = {}) {
+  const headers = new Headers(options.headers || {});
+  const key = $("apiKey").value.trim();
+
+  if (key && url.startsWith("/api/")) {
+    headers.set("X-API-Key", key);
+  }
+
+  const response = await fetch(url, {...options, headers});
+
+  if (!response.ok) {
+    let message = `Request failed (${response.status})`;
+    try {
+      const data = await response.json();
+      message = data.detail || message;
+    } catch {}
+    throw new Error(message);
+  }
+
+  return response.json();
+}
+
+async function checkApi() {
+  try {
+    await api("/health");
+    $("apiStatus").textContent = "● API connected";
+    $("apiStatus").style.color = "var(--green)";
+    await Promise.all([loadSummary(), loadHistory()]);
+  } catch (error) {
+    $("apiStatus").textContent = "● API unavailable";
+    $("apiStatus").style.color = "var(--red)";
+    $("formStatus").textContent =
+      "Start the FastAPI server, then refresh this page. " + error.message;
+  }
+}
+
+async function loadSummary() {
+  const data = await api("/api/dashboard-summary");
+  $("mTotal").textContent = data.total_analyses ?? 0;
+  $("mHigh").textContent = data.high_risk ?? 0;
+  $("mSusp").textContent = data.suspicious ?? 0;
+  $("mAvg").textContent = data.average_risk ?? 0;
+}
+
+async function analyzeText() {
+const sender = $("sender").value.trim();
+const subject = $("subject").value.trim();
+const body = $("body").value.trim();
+const headers = $("headers").value.trim();
+
+if (!sender && !subject && !body && !headers) {
+  $("formStatus").textContent =
+    "Please enter an email sender, subject, body, or headers before analyzing.";
+  return;
+}
+  const button = $("analyzeBtn");
+  button.disabled = true;
+  $("formStatus").textContent = "Analyzing email…";
+
+  try {
+    const data = await api("/api/analyze", {
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({
+        sender:$("sender").value,
+        subject:$("subject").value,
+        body:$("body").value,
+        raw_headers:$("headers").value,
+        include_ml:$("useML").checked,
+        include_threat_intel:$("useIntel").checked
+      })
+    });
+
+    renderResult(data);
+    $("formStatus").textContent = "Analysis saved to local history.";
+    await Promise.all([loadSummary(), loadHistory()]);
+  } catch (error) {
+    $("formStatus").textContent = "Analysis failed: " + error.message;
+  } finally {
+    button.disabled = false;
+  }
+}
+
+async function uploadEml() {
+  const file = $("eml").files[0];
+
+  if (!file) {
+    $("formStatus").textContent = "Choose an .eml file first.";
+    return;
+  }
+
+  if (file.size > 5 * 1024 * 1024) {
+    $("formStatus").textContent = "File exceeds the 5 MB limit.";
+    return;
+  }
+
+  const button = $("uploadBtn");
+  const formData = new FormData();
+  formData.append("file", file);
+  button.disabled = true;
+  $("formStatus").textContent = "Uploading and analyzing…";
+
+  try {
+    const data = await api(
+      "/api/analyze-file?include_ml=" + $("useML").checked +
+      "&include_threat_intel=" + $("useIntel").checked,
+      {method:"POST", body:formData}
+    );
+
+    renderResult(data);
+    $("formStatus").textContent = "File analyzed and saved to history.";
+    await Promise.all([loadSummary(), loadHistory()]);
+  } catch (error) {
+    $("formStatus").textContent = "File analysis failed: " + error.message;
+  } finally {
+    button.disabled = false;
+  }
+}
+
+function renderResult(data) {
+  latestResult = data;
+  $("report").style.display = "block";
+  $("scoreCircle").textContent = data.risk_score ?? 0;
+
+  $("scoreCircle").style.borderColor =
+    data.risk_score >= 70 ? "var(--red)" :
+    data.risk_score >= 40 ? "var(--yellow)" : "var(--green)";
+
+  $("classification").textContent = data.classification || "Unknown";
+  $("classification").className = riskClass(data.classification);
+
+  const findings = data.findings || [];
+  const urls = data.urls_found || [];
+
+  $("resultSummary").textContent =
+    `${findings.length} finding(s) · ${urls.length} URL(s) detected`;
+
+  $("resultMeta").textContent =
+    `Analysis #${data.id ?? "—"} · ${data.created_at ?? ""}`;
+
+  $("findings").innerHTML = findings.length
+    ? findings.map(item => `
+        <div class="item">
+          <b>${esc(item.title || item.rule || "Finding")}
+            <span class="muted">+${esc(item.points ?? 0)}</span>
+          </b>
+          <small>${esc(item.explanation || "")}</small>
+        </div>`).join("")
+    : '<p class="muted">No indicators detected.</p>';
+
+  $("recommendations").innerHTML = (data.recommendations || [])
+    .map(item => `<div class="item">${esc(item)}</div>`).join("") ||
+    '<p class="muted">No recommendations.</p>';
+
+  $("urls").innerHTML = urls.length
+    ? urls.map(url => `<div class="item"><small>${esc(url)}</small></div>`).join("")
+    : '<p class="muted">No URLs found.</p>';
+
+  const headers = data.header_forensics || {};
+  $("forensics").innerHTML = [
+    ["From", headers.from],
+    ["Reply-To", headers.reply_to],
+    ["Return-Path", headers.return_path],
+    ["Message-ID", headers.message_id]
+  ].map(([key, value]) => `
+      <div class="kv">
+        <span>${esc(key)}</span>
+        <span>${esc(value || "Not provided")}</span>
+      </div>`).join("");
+
+  $("auth").innerHTML = Object.entries(data.auth_results || {}).map(([key, value]) => `
+    <div class="kv">
+      <span>${esc(key.toUpperCase())}</span>
+      <span class="${
+        value === "pass" ? "low" :
+        ["fail","softfail","permerror"].includes(String(value).toLowerCase())
+          ? "high" : ""
+      }">${esc(value)}</span>
+    </div>`).join("") || '<p class="muted">No authentication results provided.</p>';
+
+  const relay = data.relay_analysis || {hops:[], hop_count:0};
+  $("hopCount").textContent = `${relay.hop_count || 0} Received header(s) parsed`;
+
+  $("relay").innerHTML = relay.hops?.length
+    ? relay.hops.map(hop => `
+        <div class="item">
+          <b>Hop ${esc(hop.hop)}</b>
+          <small>${esc(hop.ips?.join(", ") || "No IP extracted")}</small>
+          <small>${esc(hop.header || "")}</small>
+        </div>`).join("")
+    : '<p class="muted">No Received headers provided or found.</p>';
+
+  const ml = data.ml_analysis || {};
+  $("mlResults").innerHTML = ml.available
+    ? `
+      <div class="kv"><span>Model</span><span>${esc(ml.model || "ML")}</span></div>
+      <div class="kv"><span>Prediction</span><span>${esc(ml.predicted_label || "Not available")}</span></div>
+      <div class="kv"><span>Phishing probability</span><span>${Math.round((ml.phishing_probability || 0) * 100)}%</span></div>
+      <small>${esc(ml.dataset_note || "")}</small>`
+    : `<p class="muted">${esc(ml.reason || "Model not available.")}</p>`;
+
+  const intel = data.threat_intelligence || {};
+  $("intelResults").innerHTML = intel.enabled
+    ? `
+      <div class="item"><b>Hostname checks</b><small>${
+        (intel.lookups || []).map(item =>
+          esc(item.domain) + ": DNS " + esc(item.dns?.status || "unknown") +
+          ", reputation " + esc(item.reputation?.status || "unknown")
+        ).join("; ") || "No hostnames to check"
+      }</small></div>
+      <div class="item"><b>Alerts</b><small>${(intel.alerts || []).length} reputation alert(s)</small></div>
+      <small>${esc(intel.privacy_note || "")}</small>`
+    : '<p class="muted">Optional lookups are off. Enable them before analyzing to request enrichment.</p>';
+
+  $("report").scrollIntoView({behavior:"smooth", block:"start"});
+}
+
+async function loadHistory() {
+  try {
+    const params = new URLSearchParams();
+    if ($("search").value.trim()) params.set("q", $("search").value.trim());
+    if ($("filter").value) params.set("classification", $("filter").value);
+
+    const rows = await api("/api/history?" + params.toString());
+
+    $("historyRows").innerHTML = rows.length
+      ? rows.map(row => `
+        <tr>
+          <td>#${Number(row.id)}<br>
+            <span class="muted">${esc((row.created_at || "").replace("T"," ").slice(0,16))}</span>
+          </td>
+          <td>${esc(row.sender)}</td>
+          <td>${esc(row.subject)}</td>
+          <td>${esc(row.risk_score)}/100</td>
+          <td class="${riskClass(row.classification)}">${esc(row.classification)}</td>
+          <td><button class="linkbtn" onclick="openReport(${Number(row.id)})">View</button></td>
+        </tr>`).join("")
+      : '<tr><td colspan="6" class="empty">No matching analyses yet.</td></tr>';
+  } catch (error) {
+    $("historyRows").innerHTML =
+      `<tr><td colspan="6" class="empty">${esc(error.message)}</td></tr>`;
+  }
+}
+
+async function openReport(id) {
+  try {
+    const response = await fetch(`/api/report/${id}`);
+
+    if (!response.ok) {
+      throw new Error(`Report request failed: ${response.status}`);
+    }
+
+    const html = await response.text();
+    const reportWindow = window.open("", "_blank");
+
+    if (!reportWindow) {
+      alert("Please allow pop-ups to view the report.");
+      return;
+    }
+
+    reportWindow.document.open();
+    reportWindow.document.write(html);
+    reportWindow.document.close();
+  } catch (error) {
+    console.error("Report error:", error);
+    alert("Unable to open the report. Check the server and try again.");
+  }
+}
+
+
+function downloadReport() {
+  if (!latestResult?.id) {
+    alert("Run an analysis first.");
+    return;
+  }
+
+  window.location.href = "/api/report/" + encodeURIComponent(latestResult.id);
+}
+
+function exportCsv() {
+  window.location.href = "/api/export.csv";
+}
+
+/* ML evaluation: update both the dashboard panel and status message. */
+async function trainModel() {
+  const button = $("trainBtn");
+  button.disabled = true;
+
+  $("mlEvalStatus").textContent = "Evaluating ML model…";
+  $("formStatus").textContent = "Evaluating ML model…";
+
+  try {
+    const data = await api("/api/ml/evaluate", {method:"POST"});
+
+    if (!data.available) {
+      $("mlEvalStatus").textContent = "ML model is unavailable.";
+      $("formStatus").textContent = "ML model is unavailable.";
+      return;
+    }
+
+    const metrics = data.metrics || {};
+
+    const accuracy = Number(metrics.accuracy);
+    const precision = Number(metrics.precision);
+    const recall = Number(metrics.recall);
+    const f1 = Number(metrics.f1);
+
+    $("mlAccuracy").textContent =
+      Number.isFinite(accuracy) ? (accuracy * 100).toFixed(2) + "%" : "N/A";
+
+    $("mlPrecision").textContent =
+      Number.isFinite(precision) ? (precision * 100).toFixed(2) + "%" : "N/A";
+
+    $("mlRecall").textContent =
+      Number.isFinite(recall) ? (recall * 100).toFixed(2) + "%" : "N/A";
+
+    $("mlF1").textContent =
+      Number.isFinite(f1) ? (f1 * 100).toFixed(2) + "%" : "N/A";
+
+    $("mlEvalStatus").textContent =
+      `Evaluation completed: ${data.test_size} test samples out of ${data.dataset_size} synthetic samples.`;
+
+    $("formStatus").textContent =
+      `ML evaluation complete | Model: ${data.model} | ` +
+      `Accuracy: ${Number.isFinite(accuracy) ? (accuracy * 100).toFixed(2) : "N/A"}%`;
+
+  } catch (error) {
+    $("mlEvalStatus").textContent = "Evaluation failed: " + error.message;
+    $("formStatus").textContent = "ML evaluation failed: " + error.message;
+  } finally {
+    button.disabled = false;
+  }
+}
+
+function loadSample() {
+  $("sender").value = "Security <security@paypa1.com>";
+  $("subject").value = "URGENT: Verify your account immediately";
+  $("body").value =
+    "Your account will be suspended. Verify your account now at http://192.168.1.20/login and confirm your password.";
+
+  $("headers").value =
+    "From: Security <security@paypa1.com>\r\n" +
+    "Reply-To: help@other-example.test\r\n" +
+    "Return-Path: <bounce@other-example.test>\r\n" +
+    "Message-ID: <demo-123@example.test>\r\n" +
+    "Received: from unknown (203.0.113.45) by mail.example.test; Sat, 11 Oct 2026 10:00:00 +0000\r\n" +
+    "Received: from sender.example (198.51.100.12) by unknown; Sat, 11 Oct 2026 09:59:00 +0000\r\n" +
+    "Authentication-Results: mail.example.test; spf=fail; dkim=fail; dmarc=fail";
+}
+
+function clearForm() {
+  ["sender","subject","body","headers"].forEach(id => $(id).value = "");
+  $("eml").value = "";
+  $("formStatus").textContent = "";
+}
+
+checkApi();
+</script>
+</body>
+</html>

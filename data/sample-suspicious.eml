@@ -1,0 +1,12 @@
+From: Security <security@paypa1.example>
+Reply-To: help@other.example
+Return-Path: <bounce@other.example>
+Message-ID: <demo-001@unknown.example>
+Received: from unknown (203.0.113.45) by mx.example.test; Sat, 11 Oct 2026 10:00:00 +0000
+Received: from sender (198.51.100.12) by unknown; Sat, 11 Oct 2026 09:59:00 +0000
+Authentication-Results: mx.example.test; spf=fail; dkim=fail; dmarc=fail
+Subject: URGENT: Verify your account immediately
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+
+Your account will be suspended. Verify your account immediately and confirm your password at http://192.0.2.10/login

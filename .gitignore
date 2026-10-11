@@ -1,0 +1,17 @@
+venv/
+.venv/
+__pycache__/
+.pytest_cache/
+*.py[cod]
+
+.env
+.env.*
+!.env.example
+
+mailsleuth.db
+*.sqlite
+*.sqlite3
+*.db-wal
+*.db-shm
+
+data/phishing_model.joblib

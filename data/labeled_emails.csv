@@ -1,0 +1,52 @@
+sender,subject,body,label
+support@northstar-bank.example,Monthly statement available,Your monthly account statement is ready. Sign in using the bank website you normally visit.,0
+hr@company.example,Team meeting agenda,Please review the agenda before our scheduled team meeting tomorrow morning.,0
+library@university.example,Library book due date,This is a reminder that your borrowed book is due next week. Contact the library if you need help.,0
+updates@parcel.example,Delivery completed,Your parcel was delivered to the reception desk. Tracking details are available in your order history.,0
+professor@university.example,Assignment feedback,Feedback for your submitted assignment is available in the course portal.,0
+payroll@company.example,Salary slip available,Your salary slip for this month is available in the employee portal.,0
+newsletter@museum.example,Weekend exhibition,The museum newsletter includes opening hours and details about the weekend exhibition.,0
+it-helpdesk@company.example,Planned maintenance,The internal portal will be unavailable during scheduled maintenance on Saturday.,0
+registrar@university.example,Exam timetable published,The semester examination timetable has been published on the official student portal.,0
+orders@shop.example,Order confirmation,Thank you for your purchase. Your order details are available in your account.,0
+teamlead@company.example,Project status update,Please add your completed tasks to the project board before our weekly review.,0
+clinic@health.example,Appointment reminder,This is a reminder of your appointment next Tuesday. Call the clinic if you need to reschedule.,0
+bank-alert@northstar-bank.example,Card payment notice,A card payment was recorded. Review recent activity by opening the bank app directly.,0
+admin@university.example,Password reset requested,A password reset was requested. If this was you continue through the official university portal.,0
+travel@airline.example,Booking itinerary,Your flight itinerary and booking reference are attached to your travel account.,0
+manager@company.example,Quarterly report review,Please review the attached quarterly report using the shared company document system.,0
+support@cloud.example,Storage usage summary,Your monthly storage usage summary is ready in the service dashboard.,0
+community@opensource.example,Release notes,Version updates and fixes are listed in the project's official release notes.,0
+billing@utility.example,Utility bill ready,Your latest utility bill is available in your customer account.,0
+security@company.example,Security awareness session,The annual security awareness session is scheduled for Friday afternoon.,0
+service@streaming.example,Subscription receipt,Your subscription receipt is available in account billing history.,0
+registrar@college.example,Course registration confirmed,Your course registration has been recorded. Review your selections in the student portal.,0
+support@vendor.example,Support ticket update,Your support ticket has a new response. Sign in to the vendor site directly to review it.,0
+library@university.example,Library opening hours,The library will open at its regular time during the coming week.,0
+noreply@company.example,Expense report received,Your expense report has been received and will be reviewed by the finance team.,0
+security@paypa1.example,URGENT verify your account,Your account is suspended. Verify your account immediately and confirm your password at http://192.0.2.10/login,1
+support@micros0ft.example,Mailbox will be disabled,Final warning. Login credentials are required now to keep your mailbox active.,1
+billing@amaz0n.example,Payment overdue action required,Act now to avoid account suspension. Confirm your identity at http://198.51.100.20/billing,1
+security-update@unknown.example,Confirm your password,Your password expires today. Verify your account immediately using this link http://203.0.113.77/auth,1
+helpdesk@account-verify.example,One time password needed,Reply with your OTP and password to prevent your account from being locked today.,1
+ceo-office@lookalike.example,Confidential urgent transfer,Immediately transfer funds to the new account and do not call anyone to confirm.,1
+support@secure-login.example,Final warning account suspended,Your account will be suspended within 24 hours. Login credentials required at http://192.0.2.55/signin,1
+admin@university-login.example,Student portal verification,Verify your account now or your student access will be disabled. Enter your password at http://198.51.100.9/portal,1
+payroll@company-payroll.example,Salary account update,Confirm your identity and bank password immediately to receive your salary payment.,1
+it-alert@fake-micros0ft.example,Mailbox quota warning,Your mailbox is full. Act now and enter your password at http://203.0.113.19/mail,1
+refund@customer-claim.example,Refund waiting,Claim your refund immediately by providing your bank credentials and one time password.,1
+security@paypa1-support.example,Unusual login attempt,Your account is locked. Verify now at http://192.0.2.88/unlock and confirm your password.,1
+finance-director@external.example,Emergency wire transfer,Urgent confidential payment required today. Do not verify by phone; transfer funds now.,1
+cloud-team@micros0ft.example,Cloud storage disabled,Final warning: sign in immediately to restore your account using http://198.51.100.31/restore,1
+bank-secure@unknown.example,Transaction blocked,Confirm your identity and OTP now or your bank account will be permanently suspended.,1
+help@account-protection.example,Password reset failure,We detected suspicious activity. Verify your account immediately and enter your password to continue.,1
+support@amaz0n-billing.example,Order refund problem,Your refund is blocked. Act now and submit your card password at http://203.0.113.44/refund,1
+security@fake-app1e.example,Device account locked,Your account will be disabled today. Confirm your credentials immediately at http://192.0.2.101/device,1
+hr@company-benefits.example,Benefits confirmation required,Verify your account and provide your login credentials now to avoid losing your benefits.,1
+accounts@vendor-payment.example,Updated bank details urgent,Please immediately use the new bank details and do not contact the regular vendor number.,1
+alert@secure-mailbox.example,Password expiration notice,Your password expires within 24 hours. Click http://198.51.100.99/login and enter your credentials.,1
+admin@verify-user.example,Account review required,Final warning: confirm your identity with your OTP or account access will be suspended.,1
+it-support@unknown.example,Security policy violation,Act now to avoid termination. Send your password and one time password for verification.,1
+billing@paypa1.example,Payment failed urgently,Your payment failed. Verify your account immediately using http://203.0.113.222/pay,1
+ceo@company-lookalike.example,Gift card request,Urgent confidential request: purchase gift cards and send the codes immediately.,1
+support@account-check.example,Unusual activity detected,Your account is on hold. Confirm your password and OTP at http://192.0.2.200/check,1

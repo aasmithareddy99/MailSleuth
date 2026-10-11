@@ -1,0 +1,11 @@
+From: Library <library@university.example>
+Reply-To: library@university.example
+Return-Path: <bounce@university.example>
+Message-ID: <demo-002@university.example>
+Received: from mail.university.example (192.0.2.20) by mx.university.example; Sat, 11 Oct 2026 10:00:00 +0000
+Authentication-Results: mx.university.example; spf=pass; dkim=pass; dmarc=pass
+Subject: Library opening hours
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+
+Hello, the library will open at its regular time during the coming week. Please contact the library desk if you need assistance.
