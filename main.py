@@ -16,13 +16,17 @@ from email.utils import parseaddr
 from pathlib import Path
 from urllib.parse import urlparse
 
+
 from fastapi import (
     FastAPI,
     File,
     HTTPException,
     Request,
     UploadFile,
+
 )
+import secrets
+
 from fastapi.responses import (
     FileResponse,
     HTMLResponse,
@@ -51,7 +55,11 @@ MAX_UPLOAD = 5 * 1024 * 1024
 MAX_BODY_CHARS = 200_000
 MAX_HEADERS_CHARS = 100_000
 
-API_KEY = os.getenv("MAILSLEUTH_API_KEY", "").strip()
+
+DEMO_USERNAME = os.getenv("MAILSLEUTH_DEMO_USERNAME", "").strip()
+DEMO_PASSWORD = os.getenv("MAILSLEUTH_DEMO_PASSWORD", "").strip()
+
+
 
 app = FastAPI(
     title="MailSleuth",
@@ -134,22 +142,47 @@ init_db()
 # SECURITY MIDDLEWARE
 # =========================================================
 
-@app.middleware("http")
-async def security_headers_and_api_key(
-    request: Request,
-    call_next,
-):
-    if (
-        API_KEY
-        and request.method in {"POST", "PUT", "PATCH", "DELETE"}
-        and request.url.path.startswith("/api/")
-    ):
-        supplied = request.headers.get("x-api-key", "")
 
-        if supplied != API_KEY:
+@app.middleware("http")
+async def security_headers_and_api_key(request: Request, call_next):
+    path = request.url.path
+
+    # Keep the health endpoint available for service monitoring.
+    if path != "/health":
+        if not DEMO_USERNAME or not DEMO_PASSWORD:
             return JSONResponse(
-                {"detail": "Invalid or missing API key."},
+                {"detail": "Demo authentication is not configured."},
+                status_code=503,
+            )
+
+        auth_header = request.headers.get("authorization", "")
+        username = ""
+        password = ""
+
+        if auth_header.startswith("Basic "):
+            import base64
+            try:
+                decoded = base64.b64decode(
+                    auth_header[6:], validate=True
+                ).decode("utf-8")
+                username, separator, password = decoded.partition(":")
+                if not separator:
+                    username, password = "", ""
+            except (ValueError, UnicodeDecodeError):
+                username, password = "", ""
+
+        valid_username = secrets.compare_digest(
+            username, DEMO_USERNAME
+        )
+        valid_password = secrets.compare_digest(
+            password, DEMO_PASSWORD
+        )
+
+        if not (valid_username and valid_password):
+            return JSONResponse(
+                {"detail": "Demo login required."},
                 status_code=401,
+                headers={"WWW-Authenticate": 'Basic realm="MailSleuth SIH Demo"'},
             )
 
     response = await call_next(request)
@@ -157,8 +190,6 @@ async def security_headers_and_api_key(
     response.headers["X-Content-Type-Options"] = "nosniff"
     response.headers["X-Frame-Options"] = "DENY"
     response.headers["Referrer-Policy"] = "no-referrer"
-
-        
     response.headers["Content-Security-Policy"] = (
         "default-src 'self'; "
         "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; "
@@ -169,10 +200,7 @@ async def security_headers_and_api_key(
         "base-uri 'self'; "
         "frame-ancestors 'none'"
     )
-
-
     return response
-
 
 # =========================================================
 # VALIDATION AND GENERAL HELPERS
